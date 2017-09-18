@@ -12,22 +12,22 @@ module.exports = function check(str, bracketsConfig) {
 
   for (var i = 0; i < str.length; i++) {
     var currentChar = str[i];
+    var previousChar = str[i-1];
 
     if (brackets.different[currentChar]) {
       diffmem.push(currentChar);
-
+    } else if (currentChar == samemem[samemem.length - 1] && !brackets.different[previousChar]) {
+      samemem.pop();
     } else if (brackets.same[currentChar]) {
       samemem.push(currentChar);
-
-      for (i++; i < str.length; i++) {
-        if (str[i] !== sameEl && brackets.different[str[i]]) {
-          diffmem.push(str[i]);
-        }
-      }
+    } else if (!brackets.different[currentChar] && !brackets.same[currentChar] && brackets.same[previousChar] && samemem.length !== 0) {
+      return false;
+    } else if (currentChar !== brackets.different[diffmem.pop()]) {
+      return false;
     }
   }
 
-
+  return diffmem.length == 0 && samemem.length == 0;
 }
 
 function humanizeBracketsConfig (config) {
